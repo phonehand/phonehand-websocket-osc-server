@@ -41,6 +41,12 @@ ioMon.on('connection', function(socket){
 	// console.log(seats);
     }, 1000);
 
+    //clap-all
+    socket.on('clap-all', function() {
+	console.log('clap-all');
+	ioInst.emit('clap');
+    });
+
     //
     socket.on('disconnect', function(){
     	console.log('monitoring user disconnected');
