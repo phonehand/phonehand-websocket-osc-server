@@ -2,10 +2,49 @@
 // this is a node.js server
 // 
 
+// use both socket.io & osc.js
+
+// socket.io for web-browser clients. (mobile & pc clients)
+// osc.js/udp for mobmuplat client. (mobile client)
+
+////common lib
+var express = require('express');
+var http = require('http');
+
+//// socket.io service
+var ioApp = express();
+var ioServer = http.Server(ioApp);
+var io = require('socket.io')(ioServer);
+
+io.on('connection', function(socket){
+
+    //connection monitoring
+    console.log('a user connected');
+    socket.on('disconnect', function(){
+	console.log('user disconnected');
+    });
+
+    //message routing
+    socket.on('msg-playstart', function(msg){
+	console.log('message: ' + msg);
+	io.emit('msg-playstart', msg);
+    });
+    
+    socket.on('msg-playstop', function(msg){
+	console.log('message: ' + msg);
+	io.emit('msg-playstop', msg);
+    });
+});
+
+ioServer.listen(3000, function(){
+    console.log('[socket.io] listening on *:5000');
+});
+
+
+//// osc.js/udp service
 var osc = require("osc");
 var http = require("http");
 var ws = require("ws");
-var express = require("express");
 
 // there are 3 actors.
 // (1) monitoring client (mc)
