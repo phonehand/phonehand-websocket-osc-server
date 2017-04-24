@@ -60,6 +60,18 @@ ioMon.on('connection', function(socket){
 	    actstage++;
     });
 
+    //play all! (sound#)
+    socket.on('playall-start', function(msg){
+    	console.log('playall-start: ' + msg);
+    	ioInst.emit('playall-start', msg); //broadcast
+    });
+    
+    //stop all! (sound#)
+    socket.on('playall-stop', function(msg){
+    	console.log('playall-stop: ' + msg);
+    	ioInst.emit('playall-stop', msg); //broadcast
+    });
+
     //
     socket.on('disconnect', function(){
     	console.log('monitoring user disconnected');
@@ -80,17 +92,6 @@ ioInst.on('connection', function(socket){
 	seats[msg] = 1; // we won't care colliding selections.
 	seatNo = msg; // remember for later!
     });
-
-    // //simple all play & stop (example)
-    // socket.on('playall-start', function(msg){
-    // 	console.log('playall-start: ' + msg);
-    // 	io.emit('playall-start', msg); //broadcast
-    // });
-    
-    // socket.on('playall-stop', function(msg){
-    // 	console.log('playall-stop: ' + msg);
-    // 	io.emit('playall-stop', msg); //broadcast
-    // });
 
     //
     socket.on('disconnect', function(){
