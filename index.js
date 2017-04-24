@@ -23,35 +23,47 @@ var ioMon = require('socket.io')(ioMonServer);
 
 ////shared
 var seats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var actstage = 0;
 
 ioMon.on('connection', function(socket){
     //
     console.log('a monitoring user connected!');
 
-    //alive signal for the connection - every 0.5 sec
+    //periodically report server stat.
     var rollcnt = 0;
-    var id_rollcnt = setInterval(function() {
-	socket.emit('rollcnt', {'rollcnt': rollcnt});
+    var stat_reporter = setInterval(function() {
 	rollcnt++;
-    }, 500);
-
-    //report seat using stat - every 4 sec
-    var id_seats_report = setInterval(function() {
-	socket.emit('seatstat', {'seatstat': seats });
-	// console.log(seats);
+	socket.emit('stat', {
+	    'rollcnt': rollcnt,
+	    'seats': seats,
+	    'actstage': actstage
+	});
     }, 1000);
-
+    
     //clap-all
     socket.on('clap-all', function() {
 	console.log('clap-all');
 	ioInst.emit('clap');
     });
 
+    //act-prev
+    socket.on('act-prev', function() {
+	console.log('act-prev');
+	if (actstage >= 1 && actstage <= 5)
+	    actstage--;
+    });
+
+    //act-next
+    socket.on('act-next', function() {
+	console.log('act-next');
+	if (actstage >= 0 && actstage <= 4)
+	    actstage++;
+    });
+
     //
     socket.on('disconnect', function(){
     	console.log('monitoring user disconnected');
-	clearInterval(id_rollcnt);
-	clearInterval(id_seats_report);
+	clearInterval(stat_reporter);
     });
 });
 
