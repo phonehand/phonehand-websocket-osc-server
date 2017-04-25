@@ -46,18 +46,17 @@ ioMon.on('connection', function(socket){
 	ioInst.emit('clap');
     });
 
-    //act-prev
-    socket.on('act-prev', function() {
-	console.log('act-prev');
-	if (actstage >= 1 && actstage <= 5)
-	    actstage--;
+    //54321-all
+    socket.on('54321-all', function() {
+	console.log('54321-all');
+	ioInst.emit('54321');
     });
 
-    //act-next
-    socket.on('act-next', function() {
-	console.log('act-next');
-	if (actstage >= 0 && actstage <= 4)
-	    actstage++;
+    //pagechg
+    socket.on('pagechg', function(msg) {
+	console.log('pagechg: ' + msg);
+	actstage = msg;
+    	ioInst.emit('pagechg', msg); //broadcast
     });
 
     //play all! (sound#)
@@ -111,27 +110,35 @@ ioMonServer.listen(5300, function(){
     console.log('[socket.io] listening on *:5300');
 });
 
-// //// osc.js/udp service
-// var osc = require("osc");
+//// osc.js/udp service
+var osc = require("osc");
 
-// var udp_sc = new osc.UDPPort({
-//     localAddress: "0.0.0.0",
-//     localPort: 52000,
-//     metadata: true
-// });
-// //message handler
-// udp_sc.on("message", function (oscmsg, timetag, info) {
-//     console.log("[mc] get a osc message:", oscmsg);
+var udp_sc = new osc.UDPPort({
+    localAddress: "0.0.0.0",
+    localPort: 52000,
+    metadata: true
+});
 
-//     //alive handshaking
-//     udp_sc.send({
-//         address: "/mc_t",
-//         args: [ {} ]
-//     });
-    
-// });
-// //open port
-// udp_sc.open();
-// udp_sc.on("ready", function() {
-//     console.log("[udp] port opend & ready - 0.0.0.0:", udp_sc.options.localPort);
-// });
+//message handler
+udp_sc.on("message", function (oscmsg, timetag, info) {
+    console.log("[udp] got osc message:", oscmsg);
+
+    //EX)
+    // //method [1] : just relay as a whole
+    // ioInst.emit('osc-msg', oscmsg); //broadcast
+
+    //EX)
+    // //method [2] : each fields
+    // ioInst.emit('osc-address', oscmsg.address); //broadcast
+    // ioInst.emit('osc-type', oscmsg.type); //broadcast
+    // ioInst.emit('osc-args', oscmsg.args); //broadcast
+    // ioInst.emit('osc-value0', oscmsg.args[0].value); //broadcast
+
+    //just grab i need.. note!
+    ioInst.emit('sing-note', oscmsg.address); //broadcast
+});
+//open port
+udp_sc.open();
+udp_sc.on("ready", function() {
+    console.log("[udp] ready... - 0.0.0.0:", udp_sc.options.localPort);
+});
