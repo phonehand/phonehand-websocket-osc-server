@@ -52,6 +52,24 @@ ioMon.on('connection', function(socket){
 	ioInst.emit('54321');
     });
 
+    //intro-all
+    socket.on('intro-all', function() {
+	console.log('intro-all');
+	ioInst.emit('intro');
+    });
+
+    //brassband-all
+    socket.on('brassband-all', function() {
+	console.log('brassband-all');
+	ioInst.emit('brassband');
+    });
+
+    //brassband-stop-all
+    socket.on('brassband-stop-all', function() {
+	console.log('brassband-stop-all');
+	ioInst.emit('brassband-stop');
+    });
+
     //pagechg
     socket.on('pagechg', function(msg) {
 	console.log('pagechg: ' + msg);
